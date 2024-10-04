@@ -1,12 +1,13 @@
 #include "Camera.hpp"
 #include "CameraInfoOverlay.hpp"
 #include "PerformanceOverlay.hpp"
-#include "Profiling.hpp"
 #include "Renderer.hpp"
 #include "RendererOverlay.hpp"
 #include "Scene.hpp"
 #include "Timestep.hpp"
 #include "Window.hpp"
+
+#include "Game.hpp"
 
 int main(void)
 {
@@ -22,41 +23,34 @@ int main(void)
 	birb::overlay::renderer_overlay render_widget(renderer);
 	birb::overlay::camera_info camera_widget(camera);
 
-	renderer.debug.alloc_world(window);
+	renderer.set_scene(scene);
+
+	renderer.debug.alloc_camera_info(camera);
 	renderer.debug.alloc_entity_editor(scene);
+	renderer.debug.alloc_performance_stats(timestep);
+	renderer.debug.alloc_render_stats(renderer);
+	renderer.debug.alloc_world(window);
+
+	ld::game game(renderer, window, camera, timestep, scene);
+	game.start();
 
 	while (!window.should_close())
 	{
+		camera.process_input(window, timestep);
+
 		while (window.inputs_available())
 		{
 			birb::input input = window.next_input();
-
-			if (input.state == birb::input::action::key_down)
-			{
-				switch (input.key)
-				{
-					case (birb::input::keycode::escape):
-						window.quit();
-
-					default:
-						break;
-				}
-			}
+			game.input(input);
 		}
+
+		game.update();
 
 		window.clear();
 
-		/////////////////////
-		// Draw stuff here //
-		/////////////////////
+		game.render();
 
-		{
-			PROFILER_SCOPE_RENDER("Debug widgets");
-			perf_widget.draw();
-			render_widget.draw();
-			camera_widget.draw();
-		}
-
+		renderer.draw_entities(camera, window.size());
 		window.flip();
 
 		window.poll();
