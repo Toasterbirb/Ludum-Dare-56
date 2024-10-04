@@ -7,11 +7,12 @@
 
 namespace ld
 {
-	game_state::game_state(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep)
+	game_state::game_state(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player)
 	:renderer(renderer),
 	 window(window),
 	 camera(camera),
-	 timestep(timestep)
+	 timestep(timestep),
+	 audio_player(audio_player)
 	{}
 
 }

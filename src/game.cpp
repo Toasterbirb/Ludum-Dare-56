@@ -4,8 +4,8 @@
 
 namespace ld
 {
-	game::game(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep)
-	:game_state(renderer, window, camera, timestep)
+	game::game(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player)
+	:game_state(renderer, window, camera, timestep, audio_player)
 	{}
 
 	void game::awake()

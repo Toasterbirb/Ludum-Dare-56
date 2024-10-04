@@ -3,6 +3,7 @@
 #include "ColorPalette.hpp"
 #include "GameState.hpp"
 
+#include "AudioPlayer.hpp"
 #include "Entity.hpp"
 #include "Mesh.hpp"
 
@@ -13,7 +14,7 @@ namespace ld
 	class main_menu : public game_state
 	{
 	public:
-		explicit main_menu(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep);
+		explicit main_menu(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player);
 
 		void awake() override;
 		void start() override;
@@ -34,8 +35,8 @@ namespace ld
 				birb::component::state |
 				birb::component::default_shader);
 
-		u8 main_menu_selected_button = 0;
-		std::array<birb::entity, 3> main_menu_buttons = {
+		u8 selected_button = 0;
+		std::array<birb::entity, 3> buttons = {
 			scene.create_entity(birb::component::transform |
 					birb::component::state |
 					birb::component::default_shader), // start button
@@ -49,12 +50,18 @@ namespace ld
 					birb::component::default_shader)  // exit button
 		};
 
-		std::array<birb::mesh*, 3> main_menu_button_meshes;
+		std::array<birb::mesh*, 3> button_meshes;
 
-		std::array<birb::color, 3> main_menu_button_colors = {
+		std::array<birb::color, 3> button_colors = {
 			color_palette::start_game_button,
 			color_palette::settings_button,
 			color_palette::exit_game_button
+		};
+
+		std::array<birb::sound_file, 3> button_sounds = {
+			birb::sound_file("./assets/sfx/play.wav"),
+			birb::sound_file("./assets/sfx/settings.wav"),
+			birb::sound_file("./assets/sfx/exit.wav")
 		};
 	};
 }

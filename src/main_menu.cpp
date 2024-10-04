@@ -8,8 +8,8 @@
 
 namespace ld
 {
-	main_menu::main_menu(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep)
-	:game_state(renderer, window, camera, timestep)
+	main_menu::main_menu(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player)
+	:game_state(renderer, window, camera, timestep, audio_player)
 	{}
 
 	void main_menu::awake()
@@ -19,19 +19,19 @@ namespace ld
 
 		// setup buttons
 		birb::model m_start("./assets/main_menu_button_start.obj");
-		main_menu_buttons[0].add_component(m_start);
-		main_menu_button_meshes[0] = m_start.get_mesh_by_name("start_button");
-		birb::ensure(main_menu_button_meshes[0] != nullptr, "Can't find the main menu start button mesh");
+		buttons[0].add_component(m_start);
+		button_meshes[0] = m_start.get_mesh_by_name("start_button");
+		birb::ensure(button_meshes[0] != nullptr, "Can't find the main menu start button mesh");
 
 		birb::model m_settings("./assets/main_menu_button_settings.obj");
-		main_menu_buttons[1].add_component(m_settings);
-		main_menu_button_meshes[1] = m_settings.get_mesh_by_name("settings_button");
-		birb::ensure(main_menu_button_meshes[1] != nullptr, "Can't find the main menu settings button mesh");
+		buttons[1].add_component(m_settings);
+		button_meshes[1] = m_settings.get_mesh_by_name("settings_button");
+		birb::ensure(button_meshes[1] != nullptr, "Can't find the main menu settings button mesh");
 
 		birb::model m_exit("./assets/main_menu_button_exit.obj");
-		main_menu_buttons[2].add_component(m_exit);
-		main_menu_button_meshes[2] = m_exit.get_mesh_by_name("exit_button");
-		birb::ensure(main_menu_button_meshes[2] != nullptr, "Can't find the main menu exit button mesh");
+		buttons[2].add_component(m_exit);
+		button_meshes[2] = m_exit.get_mesh_by_name("exit_button");
+		birb::ensure(button_meshes[2] != nullptr, "Can't find the main menu exit button mesh");
 	}
 
 	void main_menu::start()
@@ -56,6 +56,7 @@ namespace ld
 	{
 		if (input.state == birb::input::action::key_down)
 		{
+			bool menu_button_changed = false;
 			switch (input.key)
 			{
 				// case (birb::input::keycode::escape):
@@ -65,10 +66,11 @@ namespace ld
 				case (birb::input::keycode::k):
 				case (birb::input::keycode::up):
 				{
-					main_menu_selected_button = main_menu_selected_button > 0
-						? main_menu_selected_button - 1
+					selected_button = selected_button > 0
+						? selected_button - 1
 						: 0;
 					main_menu_update_button_highlights();
+					menu_button_changed = true;
 					break;
 				}
 
@@ -76,16 +78,17 @@ namespace ld
 				case (birb::input::keycode::j):
 				case (birb::input::keycode::down):
 				{
-					main_menu_selected_button = main_menu_selected_button < main_menu_buttons.size() - 1
-						? main_menu_selected_button + 1
-						: main_menu_buttons.size() - 1;
+					selected_button = selected_button < buttons.size() - 1
+						? selected_button + 1
+						: buttons.size() - 1;
 					main_menu_update_button_highlights();
+					menu_button_changed = true;
 					break;
 				}
 
 				case (birb::input::keycode::enter):
 				{
-					switch (main_menu_selected_button)
+					switch (selected_button)
 					{
 						case 0:
 							scene_over = true;
@@ -107,6 +110,9 @@ namespace ld
 				default:
 					break;
 			}
+
+			if (menu_button_changed)
+				audio_player.play_sound(button_sounds.at(selected_button));
 		}
 	}
 
@@ -140,32 +146,32 @@ namespace ld
 	void main_menu::main_menu_update_button_highlights()
 	{
 		// first set all buttons to inactive colors
-		for (birb::mesh* m : main_menu_button_meshes)
+		for (birb::mesh* m : button_meshes)
 			m->material.diffuse = color_palette::inactive_button;
 
 		// set the active button to the "active" color
-		main_menu_button_meshes.at(main_menu_selected_button)->material.diffuse = main_menu_button_colors.at(main_menu_selected_button);
+		button_meshes.at(selected_button)->material.diffuse = button_colors.at(selected_button);
 
 
 		constexpr f32 inactive_button_position = -0.08f;
 		constexpr f32 active_button_position = 0.05f;
 
 		// move all buttons back to the inactive position
-		for (birb::entity& button : main_menu_buttons)
+		for (birb::entity& button : buttons)
 		{
 			birb::transform& t = button.get_component<birb::transform>();
 			t.position.z = inactive_button_position;
 		}
 
 		// move the active button forward
-		birb::transform& t = main_menu_buttons.at(main_menu_selected_button).get_component<birb::transform>();
+		birb::transform& t = buttons.at(selected_button).get_component<birb::transform>();
 		t.position.z = active_button_position;
 	}
 
 	void main_menu::main_menu_hide()
 	{
 		// disable buttons
-		for (birb::entity& button : main_menu_buttons)
+		for (birb::entity& button : buttons)
 			button.get_component<birb::state>().active = false;
 
 		// hide the background

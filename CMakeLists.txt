@@ -17,6 +17,7 @@ include_directories(
 	birb3d/engine/rendering/include
 	birb3d/engine/scenes/include
 	birb3d/engine/widgets/include
+	birb3d/engine/audio/include
 )
 
 add_subdirectory(birb3d)

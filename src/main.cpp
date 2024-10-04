@@ -1,3 +1,4 @@
+#include "AudioDevice.hpp"
 #include "Camera.hpp"
 #include "CameraInfoOverlay.hpp"
 #include "PerformanceOverlay.hpp"
@@ -29,8 +30,11 @@ int main(void)
 	renderer.debug.alloc_render_stats(renderer);
 	renderer.debug.alloc_world(window);
 
-	ld::main_menu main_menu_scene(renderer, window, camera, timestep);
-	ld::game game_scene(renderer, window, camera, timestep);
+	birb::audio_device audio_dev;
+	birb::audio_player audio_player;
+
+	ld::main_menu main_menu_scene(renderer, window, camera, timestep, audio_player);
+	ld::game game_scene(renderer, window, camera, timestep, audio_player);
 
 	std::unordered_map<ld::game_scene, ld::game_state*> scenes = {
 		{ ld::game_scene::main_menu, &main_menu_scene },
@@ -92,4 +96,6 @@ int main(void)
 		window.poll();
 		timestep.step();
 	}
+
+	audio_player.free_sources();
 }

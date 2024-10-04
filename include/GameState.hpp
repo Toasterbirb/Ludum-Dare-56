@@ -2,6 +2,7 @@
 
 #include "GameScenes.hpp"
 
+#include "AudioPlayer.hpp"
 #include "Camera.hpp"
 #include "Renderer.hpp"
 #include "Timestep.hpp"
@@ -11,7 +12,7 @@ namespace ld
 	class game_state
 	{
 	public:
-		game_state(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep);
+		game_state(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_device);
 
 		virtual void awake() = 0;
 		virtual void start() = 0;
@@ -28,5 +29,6 @@ namespace ld
 		birb::window& window;
 		birb::camera& camera;
 		birb::timestep& timestep;
+		birb::audio_player& audio_player;
 	};
 }

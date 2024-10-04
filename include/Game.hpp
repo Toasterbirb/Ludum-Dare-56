@@ -8,7 +8,7 @@ namespace ld
 	class game : public game_state
 	{
 	public:
-		explicit game(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep);
+		explicit game(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player);
 
 		void awake() override;
 		void start() override;
