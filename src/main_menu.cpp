@@ -62,6 +62,7 @@ namespace ld
 				// 	window.quit();
 
 				case (birb::input::keycode::w):
+				case (birb::input::keycode::k):
 				case (birb::input::keycode::up):
 				{
 					main_menu_selected_button = main_menu_selected_button > 0
@@ -72,6 +73,7 @@ namespace ld
 				}
 
 				case (birb::input::keycode::s):
+				case (birb::input::keycode::j):
 				case (birb::input::keycode::down):
 				{
 					main_menu_selected_button = main_menu_selected_button < main_menu_buttons.size() - 1
