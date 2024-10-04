@@ -3,11 +3,13 @@
 #include "PerformanceOverlay.hpp"
 #include "Renderer.hpp"
 #include "RendererOverlay.hpp"
-#include "Scene.hpp"
 #include "Timestep.hpp"
 #include "Window.hpp"
 
 #include "Game.hpp"
+#include "GameScenes.hpp"
+#include "MainMenu.hpp"
+
 
 int main(void)
 {
@@ -17,38 +19,72 @@ int main(void)
 	birb::timestep timestep;
 	birb::renderer renderer;
 	birb::camera camera(window.size());
-	birb::scene scene;
 
 	birb::overlay::performance perf_widget(timestep);
 	birb::overlay::renderer_overlay render_widget(renderer);
 	birb::overlay::camera_info camera_widget(camera);
 
-	renderer.set_scene(scene);
-
 	renderer.debug.alloc_camera_info(camera);
-	renderer.debug.alloc_entity_editor(scene);
 	renderer.debug.alloc_performance_stats(timestep);
 	renderer.debug.alloc_render_stats(renderer);
 	renderer.debug.alloc_world(window);
 
-	ld::game game(renderer, window, camera, timestep, scene);
-	game.start();
+	ld::main_menu main_menu_scene(renderer, window, camera, timestep);
+	ld::game game_scene(renderer, window, camera, timestep);
+
+	std::unordered_map<ld::game_scene, ld::game_state*> scenes = {
+		{ ld::game_scene::main_menu, &main_menu_scene },
+		{ ld::game_scene::game, &game_scene }
+	};
+
+	// call awake on each of the scenes
+	for (auto& [scene, game_state] : scenes)
+		game_state->awake();
+
+	const auto activate_scene = [&](const ld::game_scene scene) -> ld::game_state*
+	{
+		// return a null pointer if the next scene is the exit scene
+		if (scene == ld::game_scene::exit)
+			return nullptr;
+
+		birb::ensure(scenes.contains(scene), "Tried to activate a game scene that hasn't been implemented yet");
+
+		scenes.at(scene)->start();
+		renderer.set_scene(scenes.at(scene)->scene);
+		renderer.debug.alloc_entity_editor(scenes.at(scene)->scene);
+		return scenes.at(scene);
+	};
+
+	ld::game_state* active_scene = activate_scene(ld::game_scene::main_menu);
+
 
 	while (!window.should_close())
 	{
+		// check if the scene should be swapped out
+		if (active_scene->scene_over)
+		{
+			active_scene->scene_over = false;
+			renderer.debug.dealloc_entity_editor(); // deallocate the previous entity inspector
+			active_scene = activate_scene(active_scene->end()); // swap to the next scene
+
+			// if the next scene is nullptr, the game is over
+			if (active_scene == nullptr)
+				continue;
+		}
+
 		camera.process_input(window, timestep);
 
 		while (window.inputs_available())
 		{
 			birb::input input = window.next_input();
-			game.input(input);
+			active_scene->input(input);
 		}
 
-		game.update();
+		active_scene->update();
 
 		window.clear();
 
-		game.render();
+		active_scene->render();
 
 		renderer.draw_entities(camera, window.size());
 		window.flip();

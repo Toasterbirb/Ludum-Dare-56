@@ -1,75 +1,24 @@
 #pragma once
 
-#include "Camera.hpp"
-#include "Color.hpp"
 #include "Entity.hpp"
-#include "Mesh.hpp"
-#include "Renderer.hpp"
-#include "Timestep.hpp"
-
-#include "ColorPalette.hpp"
-
-#include <array>
-#include <vector>
+#include "GameState.hpp"
 
 namespace ld
 {
-	class game
+	class game : public game_state
 	{
 	public:
-		game(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::scene& scene);
+		explicit game(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep);
 
-		void start();
-		void input(birb::input& input);
-		void update();
-		void render();
+		void awake() override;
+		void start() override;
+		void input(birb::input& input) override;
+		void update() override;
+		void render() override;
+		game_scene end() override;
 
 	private:
-		birb::renderer& renderer;
-		birb::window& window;
-		birb::camera& camera;
-		birb::timestep& timestep;
-		birb::scene& scene;
-
-		enum class game_state
-		{
-			main_menu, game
-		};
-
-		game_state state{game_state::main_menu};
-
-		// main menu //
-
-		void main_menu_camera_shake();
-		void main_menu_update_button_highlights();
-		void main_menu_hide();
-
-		birb::entity main_menu = scene.create_entity("Main menu",
-				birb::component::transform |
-				birb::component::state |
-				birb::component::default_shader);
-
-		u8 main_menu_selected_button = 0;
-		std::array<birb::entity, 3> main_menu_buttons = {
-			scene.create_entity(birb::component::transform |
-					birb::component::state |
-					birb::component::default_shader), // start button
-
-			scene.create_entity(birb::component::transform |
-					birb::component::state |
-					birb::component::default_shader), // settings button
-
-			scene.create_entity(birb::component::transform |
-					birb::component::state |
-					birb::component::default_shader)  // exit button
-		};
-
-		std::array<birb::mesh*, 3> main_menu_button_meshes;
-
-		std::array<birb::color, 3> main_menu_button_colors = {
-			color_palette::start_game_button,
-			color_palette::settings_button,
-			color_palette::exit_game_button
-		};
+		birb::entity suzanne = scene.create_entity("Suzanne",
+				birb::component::transform | birb::component::default_shader);
 	};
 }
