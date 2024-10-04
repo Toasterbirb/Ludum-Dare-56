@@ -18,6 +18,14 @@ namespace ld
 	{
 		camera.mouse_controls_enabled = true;
 		camera.keyboard_controls_enabled = true;
+
+		// avoid cursor jumps by polling input before setting camera position
+		// and rotation
+		camera.process_input(window, timestep);
+
+		camera.position = { -1.68902, -0.157325, 4.73655 };
+		camera.pitch = 2.1;
+		camera.yaw = 292.1;
 	}
 
 	void game::input(birb::input& input)
