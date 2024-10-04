@@ -2,6 +2,7 @@
 
 #include "Entity.hpp"
 #include "GameState.hpp"
+#include "Mesh.hpp"
 
 namespace ld
 {
@@ -20,5 +21,7 @@ namespace ld
 	private:
 		birb::entity suzanne = scene.create_entity("Suzanne",
 				birb::component::transform | birb::component::default_shader);
+
+		birb::mesh* suzanne_mesh{nullptr};
 	};
 }

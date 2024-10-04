@@ -1,6 +1,9 @@
 #include "Game.hpp"
 #include "GameScenes.hpp"
 #include "Model.hpp"
+#include "RaycastTarget.hpp"
+#include "Raycasting.hpp"
+#include "Transform.hpp"
 
 namespace ld
 {
@@ -11,7 +14,11 @@ namespace ld
 	void game::awake()
 	{
 		birb::model m_suzanne("./assets/suzanne.obj");
-		suzanne.add_component(m_suzanne);
+
+		birb::raycast_target r_suzanne;
+		r_suzanne.radius = 1.0f;
+
+		suzanne.add_components(m_suzanne, r_suzanne);
 	}
 
 	void game::start()
@@ -26,6 +33,8 @@ namespace ld
 		camera.position = { -1.68902, -0.157325, 4.73655 };
 		camera.pitch = 2.1;
 		camera.yaw = 292.1;
+
+		suzanne_mesh = suzanne.get_component<birb::model>().get_mesh_by_name("Suzanne");
 	}
 
 	void game::input(birb::input& input)
@@ -38,6 +47,10 @@ namespace ld
 					scene_over = true;
 					break;
 
+				case birb::input::keycode::mouse_left:
+					std::cout << camera.raycast(birb::camera::raycast_type::fps, window) << '\n';
+					break;
+
 				default:
 					break;
 			}
@@ -46,7 +59,11 @@ namespace ld
 
 	void game::update()
 	{
-
+		const birb::vec3<f32> ray = camera.raycast(birb::camera::raycast_type::fps, window);
+		if (birb::raycast_hit(ray, scene, camera.position).has_value())
+			suzanne_mesh->material.diffuse = 0xc0c741;
+		else
+			suzanne_mesh->material.diffuse = 0x1f0e1c;
 	}
 
 	void game::render()
