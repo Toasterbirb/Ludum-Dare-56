@@ -7,10 +7,15 @@
 #include "Timestep.hpp"
 #include "Window.hpp"
 
+#include "Level1.hpp"
+#include "Level2.hpp"
+
 #include "Game.hpp"
 #include "GameScenes.hpp"
 #include "MainMenu.hpp"
 
+#define LEVEL(NAME) ld::NAME NAME(renderer, window, camera, timestep, audio_player)
+#define LEVEL_PAIR(NAME) { ld::game_scene::NAME, &NAME }
 
 int main(void)
 {
@@ -36,9 +41,17 @@ int main(void)
 	ld::main_menu main_menu_scene(renderer, window, camera, timestep, audio_player);
 	ld::game game_scene(renderer, window, camera, timestep, audio_player);
 
+	// level states
+	LEVEL(level1);
+	LEVEL(level2);
+
 	std::unordered_map<ld::game_scene, ld::game_state*> scenes = {
 		{ ld::game_scene::main_menu, &main_menu_scene },
-		{ ld::game_scene::game, &game_scene }
+		{ ld::game_scene::game, &game_scene },
+
+		// // levels
+		LEVEL_PAIR(level1),
+		LEVEL_PAIR(level2)
 	};
 
 	// call awake on each of the scenes

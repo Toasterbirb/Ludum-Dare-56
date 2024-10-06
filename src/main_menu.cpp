@@ -92,6 +92,7 @@ namespace ld
 					{
 						case 0:
 							scene_over = true;
+							audio_player.play_sound(start_game);
 							break;
 
 						case 1:

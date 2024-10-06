@@ -4,6 +4,10 @@ namespace ld
 {
 	enum class game_scene
 	{
-		main_menu, game, exit
+		main_menu, game, exit,
+
+		// levels
+		level1,
+		level2
 	};
 }

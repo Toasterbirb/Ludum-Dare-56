@@ -2,7 +2,8 @@
 
 #include "Entity.hpp"
 #include "GameState.hpp"
-#include "Mesh.hpp"
+#include "GameScenes.hpp"
+#include "Model.hpp"
 
 namespace ld
 {
@@ -19,9 +20,20 @@ namespace ld
 		game_scene end() override;
 
 	private:
-		birb::entity suzanne = scene.create_entity("Suzanne",
-				birb::component::transform | birb::component::default_shader);
+		birb::entity level_select_background = scene.create_entity("Background",
+			birb::component::transform | birb::component::default_shader
+		);
 
-		birb::mesh* suzanne_mesh{nullptr};
+		static constexpr u8 level_count = 1;
+		size_t current_level_index{0};
+		game_scene next_scene;
+
+		// Instantiate levels
+		std::array<game_scene, level_count> levels = {
+			game_scene::level1
+		};
+
+		std::array<std::unique_ptr<birb::entity>, level_count> button_entities;
+		std::array<birb::model, level_count> button_models;
 	};
 }

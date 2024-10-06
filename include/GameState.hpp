@@ -4,8 +4,18 @@
 
 #include "AudioPlayer.hpp"
 #include "Camera.hpp"
+#include "Direction.hpp"
+#include "Entity.hpp"
+#include "Font.hpp"
+#include "FontManager.hpp"
+#include "PhysicsWorld.hpp"
+#include "Random.hpp"
 #include "Renderer.hpp"
+#include "Scene.hpp"
+#include "Text.hpp"
 #include "Timestep.hpp"
+
+#define DEFAULT_3D_ENTITY scene.create_entity(birb::component::transform | birb::component::default_shader)
 
 namespace ld
 {
@@ -21,8 +31,12 @@ namespace ld
 		virtual void render() = 0;
 		virtual game_scene end() = 0;
 
+		direction held_direction();
+
 		birb::scene scene;
+		birb::physics_world world;
 		bool scene_over = false;
+		birb::random rng;
 
 	protected:
 		birb::renderer& renderer;

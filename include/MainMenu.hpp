@@ -37,17 +37,9 @@ namespace ld
 
 		u8 selected_button = 0;
 		std::array<birb::entity, 3> buttons = {
-			scene.create_entity(birb::component::transform |
-					birb::component::state |
-					birb::component::default_shader), // start button
-
-			scene.create_entity(birb::component::transform |
-					birb::component::state |
-					birb::component::default_shader), // settings button
-
-			scene.create_entity(birb::component::transform |
-					birb::component::state |
-					birb::component::default_shader)  // exit button
+			DEFAULT_3D_ENTITY, // start button
+			DEFAULT_3D_ENTITY, // settings button
+			DEFAULT_3D_ENTITY  // exit button
 		};
 
 		std::array<birb::mesh*, 3> button_meshes;
@@ -63,5 +55,7 @@ namespace ld
 			birb::sound_file("./assets/sfx/settings.wav"),
 			birb::sound_file("./assets/sfx/exit.wav")
 		};
+
+		birb::sound_file start_game = birb::sound_file("./assets/sfx/start_game.wav");
 	};
 }
