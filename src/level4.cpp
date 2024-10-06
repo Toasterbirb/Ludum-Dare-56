@@ -1,21 +1,20 @@
+#include "Level4.hpp"
 #include "BoxCollider.hpp"
 #include "GameScenes.hpp"
-#include "Level1.hpp"
-#include "Model.hpp"
 #include "Model.hpp"
 
 namespace ld
 {
-	level1::level1(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player)
+	level4::level4(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player)
 	:level_state(renderer, window, camera, timestep, audio_player)
 	{}
 
-	void level1::awake()
+	void level4::awake()
 	{
-		blobs.resize(2);
+		blobs.resize(3);
 		level_state::awake();
 
-		birb::model m_floor("./assets/level1.obj");
+		birb::model m_floor("./assets/level4.obj");
 		floor.add_component(m_floor);
 
 		// setup goal collider
@@ -31,7 +30,7 @@ namespace ld
 		walkable_area[0].add_component(c_walk_area);
 	}
 
-	void level1::start()
+	void level4::start()
 	{
 		level_state::start();
 
@@ -39,23 +38,12 @@ namespace ld
 		// and rotation
 		camera.process_input(window, timestep);
 
-		camera.position = { 7, 3.0, 0.1 };
-		camera.pitch = -28;
-		camera.yaw = 200;
-
-		rescued_blobs = 0;
-
-		// reset the timer and boosts when the first level starts
-		timer = 0;
-
-		// use the same seed on every round
-		rng.seed(42);
-
-		// setup lighting
-		birb::shader::directional_light.direction = {-3.8, -9.4, -3};
+		camera.position = { 8, 5, -2 };
+		camera.pitch = -35;
+		camera.yaw = 180;
 	}
 
-	void level1::input(birb::input& input)
+	void level4::input(birb::input& input)
 	{
 		level_state::input(input);
 
@@ -69,20 +57,20 @@ namespace ld
 		}
 	}
 
-	void level1::update()
+	void level4::update()
 	{
 		level_state::update();
 		blob_tick(walkable_area);
 	}
 
-	void level1::render()
+	void level4::render()
 	{
 		level_state::render();
 
 	}
 
-	game_scene level1::end()
+	game_scene level4::end()
 	{
-		return game_scene::level2;
+		return game_scene::game;
 	}
 }

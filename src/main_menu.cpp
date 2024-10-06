@@ -134,7 +134,7 @@ namespace ld
 		if (window.should_close())
 			return game_scene::exit;
 
-		return game_scene::game;
+		return game_scene::level1;
 	}
 
 	void main_menu::main_menu_camera_shake()

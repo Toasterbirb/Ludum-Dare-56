@@ -24,8 +24,10 @@ namespace ld
 
 		bool reached_goal{false};
 		bool is_falling{false};
+		bool is_crushed{false};
 	};
 
 	bool all_blobs_falling(const std::vector<std::unique_ptr<blob>>& blobs);
 	bool all_blobs_reached_goal(const std::vector<std::unique_ptr<blob>>& blobs);
+	bool all_blobs_crushed(const std::vector<std::unique_ptr<blob>>& blobs);
 }

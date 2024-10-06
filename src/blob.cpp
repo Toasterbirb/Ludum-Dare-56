@@ -13,7 +13,7 @@ namespace ld
 	:blob_size(rng.range_float(0.08, 0.15)),
 	 entity(scene.create_entity("blob", birb::component::transform | birb::component::default_shader | birb::component::state))
 	{
-		preferred_distance = rng.range_float(0.5, 1.2);
+		preferred_distance = rng.range_float(0.5, 2.0);
 		speed = rng.range_float(0.7, 1.0);
 
 		entity.add_component(blob_model);
@@ -40,6 +40,7 @@ namespace ld
 		entity.get_component<birb::collider::box>().set_position(t.position);
 		reached_goal = false;
 		is_falling = false;
+		is_crushed = false;
 
 		entity.get_component<birb::state>().active = true;
 	}
@@ -87,6 +88,13 @@ namespace ld
 	{
 		return std::all_of(blobs.begin(), blobs.end(), [](const std::unique_ptr<blob>& b) {
 			return b->reached_goal;
+		});
+	}
+
+	bool all_blobs_crushed(const std::vector<std::unique_ptr<blob>>& blobs)
+	{
+		return std::all_of(blobs.begin(), blobs.end(), [](const std::unique_ptr<blob>& b) {
+			return b->is_crushed;
 		});
 	}
 }

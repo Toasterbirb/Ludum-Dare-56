@@ -56,8 +56,6 @@ namespace ld
 			{
 				case birb::input::keycode::enter:
 				{
-					birb::shader::directional_light.direction = {-3.8, -9.4, -3};
-
 					scene_over = true;
 					next_scene = levels.at(current_level_index);
 					break;
