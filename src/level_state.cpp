@@ -1,7 +1,9 @@
 #include "Assert.hpp"
 #include "BoxCollider.hpp"
+#include "Info.hpp"
 #include "LevelState.hpp"
 #include "Math.hpp"
+#include "Model.hpp"
 #include "Stopwatch.hpp"
 #include "Transform.hpp"
 
@@ -9,6 +11,25 @@ namespace ld
 {
 	void level_state::awake()
 	{
+		// reset the level
+		for (size_t i = 0; i < map_size; ++i)
+		{
+			floor_layout.at(i).fill(false);
+			hazard_layout.at(i).fill(false);
+			goal_locations.at(i).fill(false);
+		}
+
+		// load models if they haven't been loaded yet
+		const auto try_load_model = [](std::unique_ptr<birb::model>& model, const std::string& path)
+		{
+			if (!model.get())
+				model = std::make_unique<birb::model>(path);
+		};
+
+		try_load_model(floor_model, "./assets/floor_tile.obj");
+		try_load_model(hazard_model, "./assets/hazard.obj");
+		try_load_model(goal_model, "./assets/goal.obj");
+
 		birb::ensure(!blobs.empty(), "Resize the blob vector before calling level state awake");
 		birb::model m_king("./assets/Blob_crown.obj");
 		king = std::make_unique<blob_king>(scene, m_king);
@@ -119,8 +140,27 @@ namespace ld
 			b->follow(king->entity.get_component<birb::transform>().position, boosted_deltatime);
 		}
 
-		// check if a blob entered the goal area
-		std::unordered_set<entt::entity> goal_collisions = world.collides_with(goal);
+		// check for different kinds of collisions
+		std::unordered_set<entt::entity> walkable_area_collisions;
+		std::unordered_set<entt::entity> goal_collisions;
+		std::unordered_set<entt::entity> hazard_collisions;
+
+		const auto get_collisions = [&](auto& collision_set, auto entity_ptr)
+		{
+			if (entity_ptr)
+			{
+				const auto new_collisions = world.collides_with(*entity_ptr);
+				collision_set.insert(new_collisions.begin(), new_collisions.end());
+			}
+		};
+
+		for (tile* t : tiles)
+		{
+			get_collisions(walkable_area_collisions, t->floor_entity.get());
+			get_collisions(goal_collisions, t->goal_entity.get());
+			get_collisions(hazard_collisions, t->hazard_entity.get());
+		}
+
 		for (size_t i = 0; i < blobs.size(); ++i)
 		{
 			if (goal_collisions.contains(blobs[i]->entity.entt()) && !blobs[i]->reached_goal)
@@ -135,27 +175,7 @@ namespace ld
 
 				reached_goal_blob_count++;
 			}
-		}
 
-		// check if blobs are still in the walkable area
-		std::unordered_set<entt::entity> walkable_area_collisions;
-		for (birb::entity area : walkable_area)
-		{
-			auto new_collisions = world.collides_with(area);
-			walkable_area_collisions.insert(new_collisions.begin(), new_collisions.end());
-		}
-
-		// check hazard collisions
-		std::unordered_set<entt::entity> hazard_collisions;
-		const auto hazard_view = scene.registry.view<hazard_tag, birb::collider::box>();
-		for (auto& entity : hazard_view)
-		{
-			auto new_collisions = world.collides_with(entity);
-			hazard_collisions.insert(new_collisions.begin(), new_collisions.end());
-		}
-
-		for (size_t i = 0; i < blobs.size(); ++i)
-		{
 			if (!walkable_area_collisions.contains(blobs[i]->entity.entt()) && !blobs[i]->is_falling)
 			{
 				blobs[i]->is_falling = true;
@@ -186,6 +206,75 @@ namespace ld
 		// if all of the blobs have fallen and didn't reach the goal, reset the level
 		if (all_fell)
 			start();
+	}
+
+	void level_state::load_level()
+	{
+		for (size_t i = 0; i < map_size; ++i)
+		{
+			for (size_t j = 0; j < map_size; ++j)
+			{
+				// make sure that the tile has been reset
+				floor_tiles.at(j).at(i).floor_entity.reset();
+				floor_tiles.at(j).at(i).hazard_entity.reset();
+				floor_tiles.at(j).at(i).goal_entity.reset();
+
+				const birb::vec2<f32> tile_pos = { j * 2.0f - map_size / 2.0f, i * 2.0f - map_size / 2.0f };
+				bool empty_tile{true};
+
+				if (floor_layout[j][i])
+				{
+					auto& entity = floor_tiles.at(j).at(i).floor_entity;
+					entity = std::make_unique<birb::entity>(DEFAULT_3D_ENTITY);
+					entity->add_component(*floor_model);
+					entity->get_component<birb::transform>().position = birb::vec3<f32>{ tile_pos.x, 0, tile_pos.y };
+
+					// create a floor collider at the position
+					birb::collider::box walkable_area;
+					walkable_area.set_position({ tile_pos.x, 1, tile_pos.y });
+					walkable_area.set_size(2);
+					entity->add_component(walkable_area);
+
+					empty_tile = false;
+				}
+
+				if (hazard_layout[j][i])
+				{
+					auto& entity = floor_tiles.at(j).at(i).hazard_entity;
+					entity = std::make_unique<birb::entity>(DEFAULT_3D_ENTITY);
+					entity->add_component(*hazard_model);
+					entity->get_component<birb::transform>().position = birb::vec3<f32>{ tile_pos.x, 0, tile_pos.y };
+
+					// create a hazard collider at the position
+					birb::collider::box hazard_collider;
+					hazard_collider.set_position({ tile_pos.x, 1, tile_pos.y });
+					hazard_collider.set_size(2);
+					entity->add_component(hazard_collider);
+
+					empty_tile = false;
+				}
+
+				if (goal_locations[j][i])
+				{
+					auto& entity = floor_tiles.at(j).at(i).goal_entity;
+					entity = std::make_unique<birb::entity>(DEFAULT_3D_ENTITY);
+					entity->add_component(*goal_model);
+					entity->add_component(birb::info("Goal"));
+					entity->get_component<birb::transform>().position = birb::vec3<f32>{ tile_pos.x, 0, tile_pos.y };
+
+					// create a goal collider at the position
+					birb::collider::box goal_collider;
+					goal_collider.set_position({ tile_pos.x, 1, tile_pos.y });
+					goal_collider.set_size(2);
+					entity->add_component(goal_collider);
+
+					empty_tile = false;
+				}
+
+				if (!empty_tile)
+					tiles.push_back(&floor_tiles[j][i]);
+			}
+		}
 	}
 
 	void level_state::start_camera_shake(const f32 duration, const f32 strength)

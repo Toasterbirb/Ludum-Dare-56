@@ -21,10 +21,10 @@ namespace ld
 
 	direction game_state::held_direction()
 	{
-		const bool left = window.is_key_held(birb::input::keycode::left) || window.is_key_held(birb::input::keycode::a);
-		const bool right = window.is_key_held(birb::input::keycode::right) || window.is_key_held(birb::input::keycode::d);
-		const bool up = window.is_key_held(birb::input::keycode::up) || window.is_key_held(birb::input::keycode::w);
-		const bool down = window.is_key_held(birb::input::keycode::down) || window.is_key_held(birb::input::keycode::s);
+		const bool left = window.is_key_held(birb::input::keycode::right) || window.is_key_held(birb::input::keycode::d);
+		const bool right = window.is_key_held(birb::input::keycode::left) || window.is_key_held(birb::input::keycode::a);
+		const bool up = window.is_key_held(birb::input::keycode::down) || window.is_key_held(birb::input::keycode::s);
+		const bool down = window.is_key_held(birb::input::keycode::up) || window.is_key_held(birb::input::keycode::w);
 
 		if (up && right)
 			return direction::koillinen;

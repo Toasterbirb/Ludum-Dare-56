@@ -33,6 +33,28 @@ namespace ld
 
 
 	protected:
+		static constexpr size_t map_size = 10;
+		std::array<std::array<bool, map_size>, map_size> floor_layout;
+		std::array<std::array<bool, map_size>, map_size> hazard_layout;
+		std::array<std::array<bool, map_size>, map_size> goal_locations;
+
+		struct tile
+		{
+			std::unique_ptr<birb::entity> floor_entity;
+			std::unique_ptr<birb::entity> hazard_entity;
+			std::unique_ptr<birb::entity> goal_entity;
+		};
+
+		std::array<std::array<tile, 16>, 16> floor_tiles;
+		std::unique_ptr<birb::model> floor_model;
+		std::unique_ptr<birb::model> hazard_model;
+		std::unique_ptr<birb::model> goal_model;
+
+		std::vector<tile*> tiles;
+
+		void load_level();
+
+
 		birb::entity floor = DEFAULT_3D_ENTITY;
 
 		birb::entity goal = scene.create_entity("Goal");

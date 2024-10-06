@@ -31,9 +31,9 @@ namespace ld
 	void blob::reset()
 	{
 		birb::transform& t = entity.get_component<birb::transform>();
-		t.position.x = 0.5 * rng.range_float(-0.5, 0.5);
+		t.position.x = 3 + 0.5 * rng.range_float(-0.5, 0.5);
 		t.position.y = blob_size;
-		t.position.z = 0.5 * rng.range_float(-0.5, 0.5);
+		t.position.z = 3 + 0.5 * rng.range_float(-0.5, 0.5);
 
 		t.local_scale = blob_size;
 

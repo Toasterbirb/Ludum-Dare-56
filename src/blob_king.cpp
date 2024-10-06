@@ -73,7 +73,7 @@ namespace ld
 		birb::transform& t = entity.get_component<birb::transform>();
 		t.position.y = king_size;
 
-		t.position.x = 0;
-		t.position.z = 0;
+		t.position.x = 3;
+		t.position.z = 3;
 	}
 }
