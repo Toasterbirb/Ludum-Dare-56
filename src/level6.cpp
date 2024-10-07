@@ -110,6 +110,6 @@ namespace ld
 
 	game_scene level6::end()
 	{
-		return game_scene::game;
+		return game_scene::level7;
 	}
 }

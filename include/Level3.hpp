@@ -17,5 +17,6 @@ namespace ld
 		game_scene end() override;
 
 	private:
+		birb::entity tutorial = DEFAULT_3D_ENTITY;
 	};
 }

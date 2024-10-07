@@ -35,6 +35,8 @@ namespace ld
 				birb::component::state |
 				birb::component::default_shader);
 
+		static inline f32 volume = 0.7f;
+
 		u8 selected_button = 0;
 		std::array<birb::entity, 3> buttons = {
 			DEFAULT_3D_ENTITY, // start button

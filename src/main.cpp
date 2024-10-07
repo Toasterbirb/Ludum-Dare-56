@@ -13,6 +13,10 @@
 #include "Level4.hpp"
 #include "Level5.hpp"
 #include "Level6.hpp"
+#include "Level7.hpp"
+#include "Level8.hpp"
+#include "Level9.hpp"
+#include "Level10.hpp"
 
 #include "Game.hpp"
 #include "GameScenes.hpp"
@@ -23,7 +27,7 @@
 
 int main(void)
 {
-	birb::window window("Playground", birb::vec2<int>(1280, 720));
+	birb::window window("Ludum Dare 56", birb::vec2<int>(1280, 720), birb::window::opt::resizable);
 	window.init_imgui();
 
 	birb::timestep timestep;
@@ -54,6 +58,10 @@ int main(void)
 	LEVEL(level4);
 	LEVEL(level5);
 	LEVEL(level6);
+	LEVEL(level7);
+	LEVEL(level8);
+	LEVEL(level9);
+	LEVEL(level10);
 
 	std::unordered_map<ld::game_scene, ld::game_state*> scenes = {
 		{ ld::game_scene::main_menu, &main_menu_scene },
@@ -66,6 +74,10 @@ int main(void)
 		LEVEL_PAIR(level4),
 		LEVEL_PAIR(level5),
 		LEVEL_PAIR(level6),
+		LEVEL_PAIR(level7),
+		LEVEL_PAIR(level8),
+		LEVEL_PAIR(level9),
+		LEVEL_PAIR(level10),
 	};
 
 	// call awake on each of the scenes

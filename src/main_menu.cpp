@@ -90,6 +90,22 @@ namespace ld
 					break;
 				}
 
+				case (birb::input::keycode::l):
+				{
+					volume += volume < 1.0f ? 0.1f : 0.0f;
+					audio_player.set_global_source_volume(volume);
+					audio_player.play_sound(button_sounds.at(1));
+					break;
+				}
+
+				case (birb::input::keycode::h):
+				{
+					volume -= volume > 0.1f ? 0.1f : 0.0f;
+					audio_player.set_global_source_volume(volume);
+					audio_player.play_sound(button_sounds.at(1));
+					break;
+				}
+
 				case (birb::input::keycode::enter):
 				{
 					switch (selected_button)

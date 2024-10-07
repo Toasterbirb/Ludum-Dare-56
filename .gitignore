@@ -49,3 +49,4 @@ build/
 build_win/
 *.blend1
 .cache/
+build_release/

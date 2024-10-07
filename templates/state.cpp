@@ -94,6 +94,6 @@ namespace ld
 
 	game_scene TEMPLATE::end()
 	{
-		return game_scene::level2;
+		return game_scene::game;
 	}
 }

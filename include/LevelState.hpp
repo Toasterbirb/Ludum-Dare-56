@@ -99,11 +99,12 @@ namespace ld
 			blob_goal_6 = 7,
 			blob_goal_7 = 8,
 			blob_goal_8 = 9,
-			hazard_fall = 10
+			hazard_fall = 10,
+			blob_death = 11,
 		};
 
 		static inline bool sfx_loaded{false};
-		static inline std::array<std::unique_ptr<birb::sound_file>, 11> sound_effects;
+		static inline std::array<std::unique_ptr<birb::sound_file>, 12> sound_effects;
 
 
 		// camera shaking

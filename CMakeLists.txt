@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.12)
 
-set(PROJECT_NAME ludum-dare)
+set(PROJECT_NAME game)
 project(${PROJECT_NAME})
 
 set(CMAKE_CXX_STANDARD 20)

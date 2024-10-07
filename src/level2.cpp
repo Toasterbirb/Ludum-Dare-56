@@ -1,7 +1,9 @@
 #include "BoxCollider.hpp"
 #include "GameScenes.hpp"
+#include "Info.hpp"
 #include "Level2.hpp"
 #include "Model.hpp"
+#include "Transform.hpp"
 
 namespace ld
 {
@@ -41,6 +43,12 @@ namespace ld
 		};
 
 		load_level();
+
+		birb::model m_tutorial("./assets/level2.obj");
+		tutorial.add_component(m_tutorial);
+		tutorial.add_component(birb::info("Tutorial"));
+		tutorial.get_component<birb::transform>().position = { 2.8, 0.25, 3 };
+		tutorial.get_component<birb::transform>().rotation = { 0, 180, 0 };
 	}
 
 	void level2::start()

@@ -68,6 +68,7 @@ namespace ld
 			sound_effects.at(static_cast<i32>(sfx::blob_goal_8)) = std::make_unique<birb::sound_file>("./assets/sfx/blob_8.wav");
 
 			sound_effects.at(static_cast<i32>(sfx::hazard_fall)) = std::make_unique<birb::sound_file>("./assets/sfx/hazard_fall.wav");
+			sound_effects.at(static_cast<i32>(sfx::blob_death)) = std::make_unique<birb::sound_file>("./assets/sfx/blob_death.wav");
 			sfx_loaded = true;
 		}
 	}
@@ -169,6 +170,7 @@ namespace ld
 			get_collisions(hazard_collisions, t->hazard_entity.get());
 		}
 
+		bool blob_got_crushed = false;
 		for (size_t i = 0; i < blobs.size(); ++i)
 		{
 			if (goal_collisions.contains(blobs[i]->entity.entt()) && !blobs[i]->reached_goal)
@@ -197,8 +199,12 @@ namespace ld
 				blobs[i]->entity.get_component<birb::transform>().local_scale.y = 0.05f;
 				blobs[i]->entity.get_component<birb::transform>().position.y = 0.05f;
 				crushed_blob_count++;
+				blob_got_crushed = true;
 			}
 		}
+
+		if (blob_got_crushed)
+			audio_player.play_sound(*sound_effects.at(static_cast<int>(level_state::sfx::blob_death)));
 
 		const bool all_reached_goal = all_blobs_reached_goal(blobs);
 		const bool all_fell = all_blobs_falling(blobs);

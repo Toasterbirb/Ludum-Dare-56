@@ -1,13 +1,14 @@
 #pragma once
 
 #include "LevelState.hpp"
+#include "PhysicsWorld.hpp"
 
 namespace ld
 {
-	class level2 : public level_state
+	class level8 : public level_state
 	{
 	public:
-		explicit level2(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player);
+		explicit level8(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player);
 
 		void awake() override;
 		void start() override;
@@ -17,6 +18,5 @@ namespace ld
 		game_scene end() override;
 
 	private:
-		birb::entity tutorial = DEFAULT_3D_ENTITY;
 	};
 }

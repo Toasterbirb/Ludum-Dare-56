@@ -56,6 +56,12 @@ namespace ld
 		};
 
 		load_level();
+
+		birb::model m_tutorial("./assets/level3.obj");
+		tutorial.add_component(m_tutorial);
+		tutorial.add_component(birb::info("Tutorial"));
+		tutorial.get_component<birb::transform>().position = { 3, -0.25, 3 };
+		tutorial.get_component<birb::transform>().rotation = { 0, 180, 0 };
 	}
 
 	void level3::start()
