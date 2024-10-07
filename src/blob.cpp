@@ -14,7 +14,7 @@ namespace ld
 	 entity(scene.create_entity("blob", birb::component::transform | birb::component::default_shader | birb::component::state))
 	{
 		preferred_distance = rng.range_float(0.5, 2.0);
-		speed = rng.range_float(0.7, 1.0);
+		speed = rng.range_float(0.7, 1.2);
 
 		entity.add_component(blob_model);
 		entity.get_component<birb::transform>().local_scale = blob_size;

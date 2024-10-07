@@ -50,6 +50,10 @@ namespace ld
 		camera.position = { 0.0f, 0.0f, 6.0f };
 		camera.yaw = -90;
 		camera.pitch = 0;
+
+		birb::shader::directional_light.direction = { 0.42, -0.38, -3.84 };
+		birb::shader::directional_light.diffuse = { 0.5, 0.5, 0.5 };
+		birb::shader::directional_light.specular = { 0.0, 1.0, 0.0 };
 	}
 
 	void main_menu::input(birb::input& input)

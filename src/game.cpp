@@ -1,41 +1,39 @@
 #include "Game.hpp"
 #include "GameScenes.hpp"
 #include "Model.hpp"
-#include "RaycastTarget.hpp"
-#include "Raycasting.hpp"
-#include "Transform.hpp"
+#include "Stopwatch.hpp"
+#include "Text.hpp"
 
 namespace ld
 {
 	game::game(birb::renderer& renderer, birb::window& window, birb::camera& camera, birb::timestep& timestep, birb::audio_player& audio_player)
-	:game_state(renderer, window, camera, timestep, audio_player)
+	:level_state(renderer, window, camera, timestep, audio_player)
 	{}
 
 	void game::awake()
 	{
-		birb::model m_background("./assets/level_select_background.obj");
-		level_select_background.add_component(m_background);
-
-		constexpr f32 button_position_offset = 4;
-		for (size_t i = 0; i < level_count; ++i)
-		{
-			const size_t level_num = i + 1;
-
-			button_entities.at(i) = std::make_unique<birb::entity>(
-				scene.create_entity(birb::component::transform | birb::component::default_shader)
-			);
-
-			// add model
-			button_models.at(i).load_model("./assets/level_buttons/level" + std::to_string(level_num) + ".obj");
-			button_entities.at(i)->add_component(button_models.at(i));
-
-			// set position
-			button_entities.at(i)->get_component<birb::transform>().position.x = i * 2 - button_position_offset;
-		}
 	}
 
 	void game::start()
 	{
+		// create the text component during start()
+		// the mononoki font might not exist during awake()
+		if (!time_score_text.has_component<birb::text>())
+		{
+			birb::text t_time("Time", *big_mononoki, {static_cast<f32>(window.size().y), 540, 0});
+			time_score_text.add_component(t_time);
+
+			birb::text t_rescued("Rescued", *big_mononoki, {static_cast<f32>(window.size().y), 620, 0});
+			rescued_text.add_component(t_rescued);
+
+			birb::text t_help("Return to the main menu by hitting the Enter key", *mononoki, {static_cast<f32>(window.size().y - 80), 450, 0});
+			help_text.add_component(t_help);
+		}
+
+		// set the texts
+		time_score_text.get_component<birb::text>().set_text("Time: " + birb::stopwatch::format_time(timer));
+		rescued_text.get_component<birb::text>().set_text("Blobs rescued: " + std::to_string(rescued_blobs));
+
 		camera.mouse_controls_enabled = false;
 		camera.keyboard_controls_enabled = false;
 
@@ -55,18 +53,7 @@ namespace ld
 			switch (input.key)
 			{
 				case birb::input::keycode::enter:
-				{
 					scene_over = true;
-					next_scene = levels.at(current_level_index);
-					break;
-				}
-
-				case birb::input::keycode::e:
-					scene_over = true;
-					break;
-
-				case birb::input::keycode::mouse_left:
-					std::cout << camera.raycast(birb::camera::raycast_type::fps, window) << '\n';
 					break;
 
 				default:
@@ -87,6 +74,6 @@ namespace ld
 
 	game_scene game::end()
 	{
-		return next_scene;
+		return game_scene::main_menu;
 	}
 }

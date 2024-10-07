@@ -69,9 +69,10 @@ namespace ld
 		std::vector<std::unique_ptr<blob>> blobs;
 
 		static inline birb::font_manager font_manager;
-		std::unique_ptr<birb::font> mononoki;
+		static inline std::unique_ptr<birb::font> mononoki;
+		static inline std::unique_ptr<birb::font> big_mononoki;
 		std::unique_ptr<birb::entity> timer_text;
-		std::unique_ptr<birb::entity> blob_count_text;
+		std::unique_ptr<birb::entity> speed_text;
 
 		static inline f32 timer{0};
 

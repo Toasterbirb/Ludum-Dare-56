@@ -69,6 +69,9 @@ namespace ld
 
 		// setup lighting
 		birb::shader::directional_light.direction = {1, -1.7, 0};
+		birb::shader::directional_light.ambient = { 0, 0, 0 };
+		birb::shader::directional_light.diffuse = { 0, 0, 0 };
+		birb::shader::directional_light.specular = { 0, 0, 0 };
 	}
 
 	void level1::input(birb::input& input)

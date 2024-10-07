@@ -1,5 +1,6 @@
 #include "Assert.hpp"
 #include "BoxCollider.hpp"
+#include "ColorPalette.hpp"
 #include "Info.hpp"
 #include "LevelState.hpp"
 #include "Math.hpp"
@@ -41,11 +42,16 @@ namespace ld
 			blobs[i] = std::make_unique<blob>(scene, m_blob);
 
 		mononoki = std::make_unique<birb::font>(font_manager.load_font("./assets/mononoki-Regular.ttf", 32));
+		big_mononoki = std::make_unique<birb::font>(font_manager.load_font("./assets/mononoki-Regular.ttf", 64));
 
 		timer_text = std::make_unique<birb::entity>(scene.create_entity("Timer text"));
+		speed_text = std::make_unique<birb::entity>(scene.create_entity("Speed text"));
 
 		birb::text t_timer_text("Timer: ", *mononoki, {20, 20, 0});
 		timer_text->add_component(t_timer_text);
+
+		birb::text t_speed_text("Timer: ", *mononoki, {20, 60, 0});
+		speed_text->add_component(t_speed_text);
 
 		if (!sfx_loaded)
 		{
@@ -62,6 +68,7 @@ namespace ld
 			sound_effects.at(static_cast<i32>(sfx::blob_goal_8)) = std::make_unique<birb::sound_file>("./assets/sfx/blob_8.wav");
 
 			sound_effects.at(static_cast<i32>(sfx::hazard_fall)) = std::make_unique<birb::sound_file>("./assets/sfx/hazard_fall.wav");
+			sfx_loaded = true;
 		}
 	}
 
@@ -94,7 +101,7 @@ namespace ld
 
 				case birb::input::keycode::j:
 				case birb::input::keycode::k:
-					movement_boost += movement_boost_increment + movement_boost * 0.05;
+					movement_boost += movement_boost_increment + movement_boost * 0.10;
 					audio_player.play_sound(*sound_effects.at(punch_sound_toggle
 								? static_cast<int>(sfx::punch1)
 								: static_cast<int>(sfx::punch2)));
@@ -111,6 +118,7 @@ namespace ld
 	{
 		timer += timestep.deltatime();
 		timer_text->get_component<birb::text>().set_text("Time: " + birb::stopwatch::format_time(timer));
+		speed_text->get_component<birb::text>().set_text("Speed boost: " + std::to_string(movement_boost));
 		camera_shake();
 	}
 
@@ -174,6 +182,7 @@ namespace ld
 				audio_player.play_sound(*sound_effects.at(blob_index));
 
 				reached_goal_blob_count++;
+				rescued_blobs++;
 			}
 
 			if (!walkable_area_collisions.contains(blobs[i]->entity.entt()) && !blobs[i]->is_falling)
@@ -199,17 +208,36 @@ namespace ld
 		if (all_crushed)
 			start();
 
-		// if all blobs that are alive reached the goal, end the level
-		if (all_reached_goal || ((fallen_blob_count + reached_goal_blob_count + crushed_blob_count) == blobs.size() && !all_fell && !all_crushed))
-			scene_over = true;
-
 		// if all of the blobs have fallen and didn't reach the goal, reset the level
 		if (all_fell)
 			start();
+
+		if (crushed_blob_count + fallen_blob_count >= blobs.size())
+			start();
+
+		if (all_reached_goal)
+			scene_over = true;
+
+		// if all blobs that are alive reached the goal, end the level
+		if (fallen_blob_count + reached_goal_blob_count + crushed_blob_count >= blobs.size() && reached_goal_blob_count > 0)
+			scene_over = true;
 	}
 
 	void level_state::load_level()
 	{
+		// reset all point lights
+		for (size_t i = 0; i < birb::shader::point_light_count; ++i)
+		{
+			birb::shader::point_lights.at(i).diffuse = {0, 0, 0};
+			birb::shader::point_lights.at(i).specular = {0, 0, 0};
+			birb::shader::point_lights.at(i).ambient = {0, 0, 0};
+
+			birb::shader::point_lights.at(i).attenuation_constant = 0.35;
+			birb::shader::point_lights.at(i).attenuation_linear = 0.07;
+		}
+
+		u16 point_light_counter = 0;
+
 		for (int i = 0; i < map_size; ++i)
 		{
 			for (int j = 0; j < map_size; ++j)
@@ -268,6 +296,14 @@ namespace ld
 					goal_collider.set_position({ tile_pos.x, 1, tile_pos.y });
 					goal_collider.set_size(2);
 					entity->add_component(goal_collider);
+
+					// move a point light to the goal location to light it up
+					birb::shader::point_lights.at(point_light_counter).position = { tile_pos.x, 2, tile_pos.y };
+					birb::shader::point_lights.at(point_light_counter).diffuse = ld::color_palette::point_diffuse;
+					birb::shader::point_lights.at(point_light_counter).specular = ld::color_palette::point_specular;
+					birb::shader::point_lights.at(point_light_counter).ambient = ld::color_palette::point_ambient;
+
+					point_light_counter++;
 
 					empty_tile = false;
 				}

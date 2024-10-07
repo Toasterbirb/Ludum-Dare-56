@@ -14,7 +14,7 @@ namespace ld
 
 	void level5::awake()
 	{
-		blobs.resize(2);
+		blobs.resize(4);
 		level_state::awake();
 
 		floor_layout = {
@@ -71,11 +71,6 @@ namespace ld
 		camera.position = { -4.49019, 4.56978, 3.54651 };
 		camera.pitch = -32.9;
 		camera.yaw = 15.8;
-
-		rescued_blobs = 0;
-
-		// reset the timer and boosts when the first level starts
-		timer = 0;
 
 		// use the same seed on every round
 		rng.seed(42);

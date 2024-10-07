@@ -42,6 +42,8 @@ int main(void)
 	birb::audio_device audio_dev;
 	birb::audio_player audio_player;
 
+	window.set_background_color({73, 68, 60});
+
 	ld::main_menu main_menu_scene(renderer, window, camera, timestep, audio_player);
 	ld::game game_scene(renderer, window, camera, timestep, audio_player);
 
