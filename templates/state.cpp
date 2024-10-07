@@ -1,7 +1,10 @@
-#include "TEMPLATE.hpp"
 #include "BoxCollider.hpp"
 #include "GameScenes.hpp"
+#include "TEMPLATE.hpp"
 #include "Model.hpp"
+#include "Model.hpp"
+
+#include <iostream>
 
 namespace ld
 {
@@ -11,36 +14,61 @@ namespace ld
 
 	void TEMPLATE::awake()
 	{
-		blobs.resize(3);
+		blobs.resize(2);
 		level_state::awake();
 
-		birb::model m_floor("./assets/level1.obj");
-		floor.add_component(m_floor);
+		floor_layout = {
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,1,1,1,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+		};
 
-		// setup goal collider
-		birb::collider::box c_goal;
-		c_goal.set_position({0, 1.0, -4});
-		c_goal.set_size({2, 2, 2});
-		goal.add_component(c_goal);
+		goal_locations = {
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,1,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+		};
 
-		// setup walkable area collider
-		birb::collider::box c_walk_area;
-		c_walk_area.set_position({0, 1, -2});
-		c_walk_area.set_size({2, 2, 6});
-		walkable_area[0].add_component(c_walk_area);
+		load_level();
 	}
 
 	void TEMPLATE::start()
 	{
 		level_state::start();
 
+
 		// avoid cursor jumps by polling input before setting camera position
 		// and rotation
 		camera.process_input(window, timestep);
 
-		camera.position = { 7, 3.0, 0.1 };
-		camera.pitch = -28;
-		camera.yaw = 200;
+		camera.position = { -4.49019, 4.56978, 3.54651 };
+		camera.pitch = -32.9;
+		camera.yaw = 15.8;
+
+		rescued_blobs = 0;
+
+		// reset the timer and boosts when the first level starts
+		timer = 0;
+
+		// use the same seed on every round
+		rng.seed(42);
+
+		// setup lighting
+		birb::shader::directional_light.direction = {1, -1.7, 0};
 	}
 
 	void TEMPLATE::input(birb::input& input)
@@ -60,7 +88,7 @@ namespace ld
 	void TEMPLATE::update()
 	{
 		level_state::update();
-		blob_tick(walkable_area);
+		blob_tick();
 	}
 
 	void TEMPLATE::render()
@@ -71,6 +99,6 @@ namespace ld
 
 	game_scene TEMPLATE::end()
 	{
-		return game_scene::game;
+		return game_scene::level2;
 	}
 }

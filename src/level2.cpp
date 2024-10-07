@@ -14,28 +14,33 @@ namespace ld
 		blobs.resize(3);
 		level_state::awake();
 
-		birb::model m_floor("./assets/level2.obj");
-		floor.add_component(m_floor);
+		floor_layout = {
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,1,0,1,0,0,0,
+			0,0,0,0,1,1,1,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+		};
 
-		// setup goal collider
-		birb::collider::box c_goal;
-		c_goal.set_position({0, 1.0, -4});
-		c_goal.set_size({2, 2, 2});
-		goal.add_component(c_goal);
+		goal_locations = {
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,1,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+		};
 
-		// setup walkable area collider
-		{
-			birb::collider::box c_walk_area;
-			c_walk_area.set_position({-2, 1, -2});
-			c_walk_area.set_size({2, 2, 6});
-			walkable_area[0].add_component(c_walk_area);
-		}
-		{
-			birb::collider::box c_walk_area;
-			c_walk_area.set_position({0, 1.0, 0});
-			c_walk_area.set_size({2, 2, 2});
-			walkable_area[1].add_component(c_walk_area);
-		}
+		load_level();
 	}
 
 	void level2::start()
@@ -46,9 +51,9 @@ namespace ld
 		// and rotation
 		camera.process_input(window, timestep);
 
-		camera.position = { 7, 3.0, 0.1 };
-		camera.pitch = -28;
-		camera.yaw = 200;
+		camera.position = { -4.49019, 4.56978, 3.54651 };
+		camera.pitch = -32.9;
+		camera.yaw = 15.8;
 	}
 
 	void level2::input(birb::input& input)
@@ -68,7 +73,7 @@ namespace ld
 	void level2::update()
 	{
 		level_state::update();
-		blob_tick(walkable_area);
+		blob_tick();
 	}
 
 	void level2::render()

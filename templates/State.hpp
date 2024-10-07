@@ -1,6 +1,7 @@
 #pragma once
 
 #include "LevelState.hpp"
+#include "PhysicsWorld.hpp"
 
 namespace ld
 {
@@ -17,6 +18,5 @@ namespace ld
 		game_scene end() override;
 
 	private:
-		std::vector<birb::entity> walkable_area = { scene.create_entity("Walkable area") };
 	};
 }

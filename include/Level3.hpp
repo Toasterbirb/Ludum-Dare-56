@@ -17,12 +17,5 @@ namespace ld
 		game_scene end() override;
 
 	private:
-		std::vector<birb::entity> walkable_area = { scene.create_entity("Walkable area") };
-		birb::entity hazard = DEFAULT_3D_ENTITY;
-		f32 hazard_timer{0};
-		const f32 hazard_delay{1.0f};
-
-		bool hazard_down{true};
-		const f32 hazard_height{2.0f};
 	};
 }

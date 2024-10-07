@@ -119,7 +119,7 @@ namespace ld
 
 	}
 
-	void level_state::blob_tick(std::vector<birb::entity>& walkable_area)
+	void level_state::blob_tick()
 	{
 		if (debug_mode)
 			return;
@@ -210,9 +210,9 @@ namespace ld
 
 	void level_state::load_level()
 	{
-		for (size_t i = 0; i < map_size; ++i)
+		for (int i = 0; i < map_size; ++i)
 		{
-			for (size_t j = 0; j < map_size; ++j)
+			for (int j = 0; j < map_size; ++j)
 			{
 				// make sure that the tile has been reset
 				floor_tiles.at(j).at(i).floor_entity.reset();
@@ -250,6 +250,7 @@ namespace ld
 					hazard_collider.set_position({ tile_pos.x, 1, tile_pos.y });
 					hazard_collider.set_size(2);
 					entity->add_component(hazard_collider);
+					entity->add_component(hazard_tag{});
 
 					empty_tile = false;
 				}
@@ -274,6 +275,42 @@ namespace ld
 				if (!empty_tile)
 					tiles.push_back(&floor_tiles[j][i]);
 			}
+		}
+	}
+
+	void level_state::update_hazards()
+	{
+		const auto move_hazards = [&](const f32 offset)
+		{
+			for (tile* t : tiles)
+			{
+				if (!t->hazard_entity.get())
+					continue;
+
+				t->hazard_entity->get_component<birb::transform>().position.y += offset;
+
+				birb::vec3<f32> collider_pos = t->hazard_entity->get_component<birb::collider::box>().position();
+				collider_pos.y += offset;
+				t->hazard_entity->get_component<birb::collider::box>().set_position(collider_pos);
+			}
+		};
+
+		hazard_timer -= timestep.deltatime();
+		if (hazard_timer < 0)
+		{
+			if (hazard_down)
+			{
+				move_hazards(hazard_height);
+			}
+			else
+			{
+				move_hazards(-hazard_height);
+				audio_player.play_sound(*sound_effects.at(static_cast<i32>(sfx::hazard_fall)));
+				start_camera_shake(0.2, 0.2);
+			}
+
+			hazard_down = !hazard_down;
+			hazard_timer = hazard_delay;
 		}
 	}
 

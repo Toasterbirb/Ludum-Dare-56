@@ -16,32 +16,46 @@ namespace ld
 		blobs.resize(4);
 		level_state::awake();
 
-		birb::model m_floor("./assets/level3.obj");
-		floor.add_component(m_floor);
+		floor_layout = {
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,1,1,1,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+		};
 
-		// setup goal collider
-		birb::collider::box c_goal;
-		c_goal.set_position({0, 1.0, -4});
-		c_goal.set_size({2, 2, 2});
-		goal.add_component(c_goal);
+		goal_locations = {
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,1,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+		};
 
-		// setup walkable area collider
-		birb::collider::box c_walk_area;
-		c_walk_area.set_position({0, 1, -2});
-		c_walk_area.set_size({2, 2, 6});
-		walkable_area[0].add_component(c_walk_area);
+		hazard_layout = {
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,1,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+			0,0,0,0,0,0,0,0,0,0,
+		};
 
-		// setup the hazard
-		hazard.add_component(birb::info("Hazard"));
-
-		birb::collider::box c_hazard(hazard.get_component<birb::transform>());
-		c_hazard.set_size(2);
-		c_hazard.set_position({0, 1, -2});
-		hazard.add_component(c_hazard);
-
-		birb::model m_hazard("./assets/level3_hazard.obj");
-		hazard.add_component(m_hazard);
-		hazard.add_component(hazard_tag{});
+		load_level();
 	}
 
 	void level3::start()
@@ -52,9 +66,9 @@ namespace ld
 		// and rotation
 		camera.process_input(window, timestep);
 
-		camera.position = { 7, 3.0, 0.1 };
-		camera.pitch = -28;
-		camera.yaw = 200;
+		camera.position = { -4.49019, 4.56978, 3.54651 };
+		camera.pitch = -32.9;
+		camera.yaw = 15.8;
 	}
 
 	void level3::input(birb::input& input)
@@ -74,34 +88,8 @@ namespace ld
 	void level3::update()
 	{
 		level_state::update();
-		blob_tick(walkable_area);
-
-		const auto move_hazard = [&](const f32 offset)
-		{
-			hazard.get_component<birb::transform>().position.y += offset;
-
-			birb::vec3<f32> collider_pos = hazard.get_component<birb::collider::box>().position();
-			collider_pos.y += offset;
-			hazard.get_component<birb::collider::box>().set_position(collider_pos);
-		};
-
-		hazard_timer -= timestep.deltatime();
-		if (hazard_timer < 0)
-		{
-			if (hazard_down)
-			{
-				move_hazard(hazard_height);
-			}
-			else
-			{
-				move_hazard(-hazard_height);
-				audio_player.play_sound(*sound_effects.at(static_cast<i32>(sfx::hazard_fall)));
-				start_camera_shake(0.2, 0.2);
-			}
-
-			hazard_down = !hazard_down;
-			hazard_timer = hazard_delay;
-		}
+		blob_tick();
+		update_hazards();
 	}
 
 	void level3::render()

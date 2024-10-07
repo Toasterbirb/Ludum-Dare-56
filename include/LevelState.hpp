@@ -26,7 +26,7 @@ namespace ld
 		virtual void render() override;
 		game_scene end() override = 0;
 
-		void blob_tick(std::vector<birb::entity>& walkable_area);
+		void blob_tick();
 
 		// disables blob ticking
 		bool debug_mode{false};
@@ -35,25 +35,31 @@ namespace ld
 	protected:
 		static constexpr size_t map_size = 10;
 		std::array<std::array<bool, map_size>, map_size> floor_layout;
-		std::array<std::array<bool, map_size>, map_size> hazard_layout;
 		std::array<std::array<bool, map_size>, map_size> goal_locations;
+		std::array<std::array<bool, map_size>, map_size> hazard_layout;
 
 		struct tile
 		{
 			std::unique_ptr<birb::entity> floor_entity;
-			std::unique_ptr<birb::entity> hazard_entity;
 			std::unique_ptr<birb::entity> goal_entity;
+			std::unique_ptr<birb::entity> hazard_entity;
 		};
 
 		std::array<std::array<tile, 16>, 16> floor_tiles;
 		std::unique_ptr<birb::model> floor_model;
-		std::unique_ptr<birb::model> hazard_model;
 		std::unique_ptr<birb::model> goal_model;
+		std::unique_ptr<birb::model> hazard_model;
 
 		std::vector<tile*> tiles;
 
 		void load_level();
 
+		f32 hazard_timer{0};
+		f32 hazard_delay{1.0f};
+
+		bool hazard_down{true};
+		const f32 hazard_height{2.0f};
+		void update_hazards();
 
 		birb::entity floor = DEFAULT_3D_ENTITY;
 

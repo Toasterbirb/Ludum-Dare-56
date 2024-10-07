@@ -11,6 +11,8 @@
 #include "Level2.hpp"
 #include "Level3.hpp"
 #include "Level4.hpp"
+#include "Level5.hpp"
+#include "Level6.hpp"
 
 #include "Game.hpp"
 #include "GameScenes.hpp"
@@ -48,6 +50,8 @@ int main(void)
 	LEVEL(level2);
 	LEVEL(level3);
 	LEVEL(level4);
+	LEVEL(level5);
+	LEVEL(level6);
 
 	std::unordered_map<ld::game_scene, ld::game_state*> scenes = {
 		{ ld::game_scene::main_menu, &main_menu_scene },
@@ -58,6 +62,8 @@ int main(void)
 		LEVEL_PAIR(level2),
 		LEVEL_PAIR(level3),
 		LEVEL_PAIR(level4),
+		LEVEL_PAIR(level5),
+		LEVEL_PAIR(level6),
 	};
 
 	// call awake on each of the scenes

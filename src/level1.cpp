@@ -17,26 +17,6 @@ namespace ld
 		blobs.resize(2);
 		level_state::awake();
 
-		// birb::model m_floor("./assets/level1.obj");
-		// floor.add_component(m_floor);
-
-		// // setup goal collider
-		// birb::collider::box c_goal;
-		// c_goal.set_position({0, 1.0, -4});
-		// c_goal.set_size({2, 2, 2});
-		// goal.add_component(c_goal);
-
-		// // setup walkable area collider
-		// birb::collider::box c_walk_area;
-		// c_walk_area.set_position({0, 1, -2});
-		// c_walk_area.set_size({2, 2, 6});
-		// walkable_area[0].add_component(c_walk_area);
-	}
-
-	void level1::start()
-	{
-		level_state::start();
-
 		floor_layout = {
 			0,0,0,0,0,0,0,0,0,0,
 			0,0,0,0,0,0,0,0,0,0,
@@ -64,6 +44,11 @@ namespace ld
 		};
 
 		load_level();
+	}
+
+	void level1::start()
+	{
+		level_state::start();
 
 
 		// avoid cursor jumps by polling input before setting camera position
@@ -103,7 +88,7 @@ namespace ld
 	void level1::update()
 	{
 		level_state::update();
-		blob_tick(walkable_area);
+		blob_tick();
 	}
 
 	void level1::render()
